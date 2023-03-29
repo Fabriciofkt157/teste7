@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Jogo Multiplayer P2P</title>
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  </head>
+  <body>
+    <h1>Jogo Multiplayer P2P</h1>
+    <h2>Jogador 1</h2>
+    <button id="gerar-peer-btn">Gerar ID</button>
+    <p>Compartilhe o ID abaixo com o Jogador 2:</p>
+    <p><strong id="peer-id"></strong></p>
+    <hr>
+    <h2>Jogador 2</h2>
+    <p>Insira o ID compartilhado pelo Jogador 1:</p>
+    <input type="text" id="peer-input">
+    <button id="conectar-btn">Conectar</button>
+    <div id="status"></div>
+    <script>
+      let codigo;
+      let peer = null;
+      let conn = null;
+      
+      // Quando o botão "Gerar ID" é clicado pelo jogador 1
+      document.getElementById('gerar-peer-btn').addEventListener('click', function() {
+        // Gera um ID aleatório
+        peer = new Peer();
+        
+        // Mostra o ID gerado na interface do jogador 1
+        peer.on('open', function(id) {
+          document.getElementById('peer-id').innerHTML = id;
+        });
+        
+        // Quando uma conexão de dados é recebida do jogador 2
+        peer.on('connection', function(connection) {
+          console.log('Conexão recebida do Jogador 2');
+          conn = connection;
+          
+          // Quando uma mensagem é recebida do jogador
+          conn.on('data', function(data) {
+            console.log('Dados recebidos do jogador:', data);
+            
+            // Envia a mensagem recebida para todos os jogadores (incluindo o remetente)
+            conn.send(data);
+          });
+        });
+      });
+      
+      // Quando o botão "Conectar" é clicado pelo jogador 2
+      document.getElementById('conectar-btn').addEventListener('click', function() {
+        const peerInput = document.getElementById('peer-input').value;
+        
+        // Conecta-se ao peer do jogador 1 usando o ID inserido pelo jogador 2
+        peer = new Peer();
+        conn = peer.connect(peerInput);
+        
+        // Quando a conexão é estabelecida
+        conn.on('open', function() {
+          console.log('Conexão estabelecida com sucesso!');
+          document.getElementById('status').innerHTML = 'Conectado';
+        });
+        
+        // Quando uma mensagem é recebida do servidor
+        conn.on('data', function(data) {
+          console.log('Dados recebidos do servidor:', data);
+        });
+      });
+    </script>
+  </body>
+</html>
