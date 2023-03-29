@@ -24,13 +24,12 @@
       
       // Quando o botão "Gerar ID" é clicado pelo jogador 1
       document.getElementById('gerar-peer-btn').addEventListener('click', function() {
-        // Gera um ID aleatório
-        peer = new Peer();
+        // Gera um ID aleatório de até 4 dígitos numéricos
+        codigo = Math.floor(Math.random() * (9999 - 1000 + 1) + 1000).toString();
+        peer = new Peer(codigo);
         
         // Mostra o ID gerado na interface do jogador 1
-        peer.on('open', function(id) {
-          document.getElementById('peer-id').innerHTML = id;
-        });
+        document.getElementById('peer-id').innerHTML = codigo;
         
         // Quando uma conexão de dados é recebida do jogador 2
         peer.on('connection', function(connection) {
@@ -69,3 +68,4 @@
     </script>
   </body>
 </html>
+
